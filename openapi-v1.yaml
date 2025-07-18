@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연장 좌석 예매 서비스 API
   description: 공연장 좌석 예매 서비스 API 문서
-  version: 1.0.1
+  version: 1.0.2
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -558,18 +558,18 @@ paths:
                         description: 공연 시간
                         example: "19:30"
                       seat:
-                          type: object
-                          description: 좌석 정보
-                          properties:
-                            section:
-                              type: string
-                              example: B
-                            row:
-                              type: integer
-                              example: 2
-                            column:
-                              type: integer
-                              example: 15
+                        type: object
+                        description: 좌석 정보
+                        properties:
+                          section:
+                            type: string
+                            example: B
+                          row:
+                            type: integer
+                            example: 2
+                          column:
+                            type: integer
+                            example: 15
                       totalAmount:
                         type: integer
                         format: int32
@@ -986,7 +986,8 @@ components:
                   example: 13
     StarRequest:
       type: object
-      required: true
+      required:
+        - star
       properties:
         star:
           type: number
@@ -1201,7 +1202,7 @@ components:
                 example: '2025-09-10'
               time:
                 type: string
-                formant: time
+                format: time
                 example: '19:00'
         seatPrices:
           type: array

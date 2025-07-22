@@ -157,44 +157,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /performances/{id}/stars:
-    post:
-      tags:
-        - performance
-      summary: 공연 별점 등록
-      description: 공연의 별점을 등록합니다.
-      operationId: submitPerformanceStar
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: 별점이 등록될 공연의 ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/StarRequest'
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: 별점 등록 성공
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StarResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /performances/{id}/reviews:
     get:
       tags:
@@ -267,14 +229,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - content
-              properties:
-                content:
-                  type: string
-                  example: 무대 연출이 압도적이었고 배우들의 몰입도가 정말 훌륭했어요!
-                  description: 리뷰 본문
+              $ref: '#/components/schemas/ReviewRequest'
       security:
         - bearerAuth: [ ]
       responses:
@@ -984,7 +939,7 @@ components:
                 likeStatus:
                   type: boolean
                   example: true
-    StarRequest:
+    ReviewRequest:
       type: object
       required:
         - star
@@ -996,6 +951,15 @@ components:
           maximum: 5
           example: 4.5
           description: 등록할 별점 (0.0 이상 5.0 이하, 소수점 1자리 허용)
+        content:
+          type: object
+          required:
+            - content
+          properties:
+            content:
+              type: string
+              example: 무대 연출이 압도적이었고 배우들의 몰입도가 정말 훌륭했어요!
+              description: 리뷰 본문
     StarResponse:
       allOf:
         - $ref: '#/components/schemas/CommonResponse'

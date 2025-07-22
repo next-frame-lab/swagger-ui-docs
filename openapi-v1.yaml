@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연장 좌석 예매 서비스 API
   description: 공연장 좌석 예매 서비스 API 문서
-  version: 1.0.2
+  version: 1.0.3
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -981,9 +981,9 @@ components:
             data:
               type: object
               properties:
-                likeCount:
-                  type: integer
-                  example: 13
+                likeStatus:
+                  type: boolean
+                  example: true
     StarRequest:
       type: object
       required:
@@ -1244,6 +1244,9 @@ components:
         content:
           type: string
           example: 정말 감동적인 공연이었어요. 무대 연출도 최고!
+        likeStatus:
+          type: boolean
+          example: true
         likeCount:
           type: integer
           example: 12

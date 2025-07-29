@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연장 좌석 예매 서비스 API
   description: 공연장 좌석 예매 서비스 API 문서
-  version: 1.0.4
+  version: 1.0.5
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -238,7 +238,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewResponse'
+                $ref: '#/components/schemas/ReviewCreateResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -283,7 +283,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewResponse'
+                $ref: '#/components/schemas/ReviewUpdateResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -506,7 +506,6 @@ paths:
                       row: 1
                       column: 13
                   totalAmount: 130000
-                  paymentMethod: "naver"
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -879,86 +878,89 @@ components:
         data:
           nullable: true
           description: 응답 데이터 (에러 시 null)
+
     PerformanceListResponse:
-      allOf:
-        - $ref: '#/components/schemas/CommonResponse'
-        - type: object
+      type: object
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: object
           properties:
-            data:
-              type: object
-              properties:
-                performances:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/PerformanceSummary'
-                pagination:
-                  $ref: '#/components/schemas/pagination'
-              example:
-                code: SUCCESS
-                data:
-                  performances:
-                    - id: "21c9b168-8575-487b-add2-67db7365ef78"
-                      name: "햄릿"
-                      imageUrl: "https://example.com/hamlet.jpg"
-                      type: "로맨스"
-                      genre: "연극"
-                      stadiumName: "서울예술의전당"
-                      startDate: "2025-08-01"
-                      endDate: "2025-08-31"
-                      averageStar: 4.7
-                      adultOnly: false
-                    - id: "ef506bfa-c48e-47d4-8ab4-199f9df6f754"
-                      name: "캣츠"
-                      imageUrl: "https://example.com/cats.jpg"
-                      type: "가족"
-                      genre: "뮤지컬"
-                      stadiumName: "대전월드컵경기장"
-                      startDate: "2025-09-10"
-                      endDate: "2025-09-25"
-                      averageStar: 4.9
-                      adultOnly: false
-                  pagination:
-                    page: 0
-                    size: 32
-                    totalItems: 2
-                    totalPages: 1
-                    hasNext: true
-                    hasPrevious: true
+            performances:
+              type: array
+              items:
+                $ref: '#/components/schemas/PerformanceSummary'
+            pagination:
+              $ref: '#/components/schemas/pagination'
+      example:
+        code: SUCCESS
+        data:
+          performances:
+            - id: "21c9b168-8575-487b-add2-67db7365ef78"
+              name: "햄릿"
+              imageUrl: "https://example.com/hamlet.jpg"
+              type: "로맨스"
+              genre: "연극"
+              stadiumName: "서울예술의전당"
+              startDate: "2025-08-01"
+              endDate: "2025-08-31"
+              averageStar: 4.7
+              adultOnly: false
+            - id: "ef506bfa-c48e-47d4-8ab4-199f9df6f754"
+              name: "캣츠"
+              imageUrl: "https://example.com/cats.jpg"
+              type: "가족"
+              genre: "뮤지컬"
+              stadiumName: "대전월드컵경기장"
+              startDate: "2025-09-10"
+              endDate: "2025-09-25"
+              averageStar: 4.9
+              adultOnly: false
+          pagination:
+            page: 0
+            size: 32
+            totalItems: 2
+            totalPages: 1
+            hasNext: true
+            hasPrevious: true
 
     PerformanceDetailResponse:
-      allOf:
-        - $ref: '#/components/schemas/CommonResponse'
-        - type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/PerformanceDetail'
-          example:
-            code: SUCCESS
-            data:
-              id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-              imageUrl: "https://example.com/"
-              name: "오페라 유령"
-              type: "로맨스"
-              genre: "오페라"
-              averageStar: 4.6
-              runningTime: 130
-              description: "전설적인 오페라의 유령이 다시 돌아옵니다."
-              adultOnly: true
-              stadium:
-                name: "부산문화회관"
-                address: "부산광역시 남구 유엔로 123"
-              performanceSchedules:
-                - id: "1a2b3c4d-5e6f-7890-abcd-1234567890ef"
-                  date: "2025-09-10"
-                  time: "19:00"
-                - id: "a0a73897-d7c1-42a9-a58e-2e3543e5c912"
-                  date: "2025-09-13"
-                  time: "15:00"
-              seatSectionPrices:
-                - section: "A"
-                  price: 120000
-                - section: "B"
-                  price: 150000
+      type: object
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: '#/components/schemas/PerformanceDetail'
+      example:
+        code: SUCCESS
+        data:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          imageUrl: "https://example.com/"
+          name: "오페라 유령"
+          type: "로맨스"
+          genre: "오페라"
+          averageStar: 4.6
+          runningTime: 130
+          description: "전설적인 오페라의 유령이 다시 돌아옵니다."
+          adultOnly: true
+          stadium:
+            name: "부산문화회관"
+            address: "부산광역시 남구 유엔로 123"
+          performanceSchedules:
+            - id: "1a2b3c4d-5e6f-7890-abcd-1234567890ef"
+              date: "2025-09-10"
+              time: "19:00"
+            - id: "a0a73897-d7c1-42a9-a58e-2e3543e5c912"
+              date: "2025-09-13"
+              time: "15:00"
+          seatSectionPrices:
+            - section: "A"
+              price: 120000
+            - section: "B"
+              price: 150000
     ReviewLikeResponse:
       allOf:
         - $ref: '#/components/schemas/CommonResponse'
@@ -1040,7 +1042,7 @@ components:
                 totalPages: 1
                 hasNext: true
                 hasPrevious: true
-    ReviewResponse:
+    ReviewCreateResponse:
       allOf:
         - $ref: '#/components/schemas/CommonResponse'
         - type: object
@@ -1056,10 +1058,22 @@ components:
                   type: string
                   format: date-time
                   example: 2025-07-11T12:45:00
+    ReviewUpdateResponse:
+      allOf:
+        - $ref: '#/components/schemas/CommonResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: b8c9d3fa-2f1a-4a5d-9e2a-812f7a91cdef
                 updatedAt:
                   type: string
                   format: date-time
-                  example: 2025-07-13T09:45:00
+                  example: 2025-07-11T12:45:00
     SeatsResponse:
       allOf:
         - $ref: '#/components/schemas/CommonResponse'

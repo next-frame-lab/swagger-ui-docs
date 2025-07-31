@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연장 좌석 예매 서비스 API
   description: 공연장 좌석 예매 서비스 API 문서
-  version: 1.0.5
+  version: 1.0.6
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -420,12 +420,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /users/{id}/reservations:
+  /users/me/reservations:
     get:
       tags:
         - reservation
       summary: 사용자 예약 목록 조회
-      description: 사용자 ID를 기반으로 해당 사용자의 예약 목록을 조회합니다.
+      description: 자신의 예약 목록을 조회합니다.
       operationId: getUserReservations
       parameters:
         - name: id
@@ -627,40 +627,20 @@ paths:
                     - naver
                     - google
                   description: 로그인 제공자 종류
-                accessToken:
+                authCode:
                   type: string
                   description: 소셜에서 발급받은 access token
                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
               required:
                 - provider
-                - accessToken
+                - authCode
       responses:
         '200':
           description: 로그인 또는 회원가입 성공
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: SUCCESS
-                    description: 응답 코드 (성공/실패 등 처리용)
-                  data:
-                    type: object
-                    properties:
-                      accessToken:
-                        type: string
-                        description: 자체 발급 access token (JWT)
-                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-                      refreshToken:
-                        type: string
-                        description: 자체 발급 refresh token (JWT)
-                        example: dGhpc2lzYXJlZnJlc2h0b2tlbg==
-                      isNewUser:
-                        type: boolean
-                        description: true면 이번에 가입된 사용자
-                        example: true
+                $ref: '#/components/schemas/SigninResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -712,78 +692,6 @@ paths:
                       refreshToken:
                         type: string
                         example: same.or.new.refresh.token
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /users/profile:
-    get:
-      tags:
-        - user
-      summary: 마이페이지 프로필 정보 조회
-      description: 인증된 사용자의 프로필 정보를 조회합니다.
-      operationId: getMyProfile
-      responses:
-        '200':
-          description: 프로필 조회 성공
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommonResponse'
-              example:
-                code: SUCCESS
-                data:
-                  imageUrl: "https://cdn.example.com/profile/user123.jpg"
-                  name: "홍길동"
-                  age: 29
-                  email: "hong@example.com"
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /users/{id}/image:
-    get:
-      tags:
-        - user
-      summary: 사용자 프로필 이미지 조회
-      description: 사용자 ID(UUID)를 기반으로 프로필 이미지 URL을 조회합니다.
-      operationId: getUserProfileImage
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: 사용자 고유 식별자
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: 프로필 이미지 URL 반환 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: SUCCESS
-                  data:
-                    type: object
-                    properties:
-                      imageUrl:
-                        type: string
-                        format: uri
-                        description: 사용자 프로필 이미지 URL
-                        example: https://cdn.example.com/profile/uuid.png
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1001,6 +909,36 @@ components:
                   format: float
                   example: 4.6
                   description: 공연의 평균 별점(0.0 이상 5.0 이하, 소수점 1자리 허용)
+    SigninData:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOi...
+          description: 자체 발급 access token (JWT)
+        refreshToken:
+          type: string
+          example: dGhpc2lzYXJ...
+          description: 자체 발급 refresh token (JWT)
+        imageUrl:
+          type: string
+          example: https://cdn.example.com/profile/user123.jpg
+        name:
+          type: string
+          example: 홍길동
+        age:
+          type: integer
+          example: 29
+        email:
+          type: string
+          example: hong@example.com
+    SigninResponse:
+      allOf:
+        - $ref: '#/components/schemas/CommonResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/SigninData'
     ReviewListResponse:
       allOf:
         - $ref: '#/components/schemas/CommonResponse'

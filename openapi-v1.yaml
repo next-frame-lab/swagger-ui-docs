@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연장 좌석 예매 서비스 API
   description: 공연장 좌석 예매 서비스 API 문서
-  version: 1.0.6
+  version: 1.0.7
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -512,7 +512,7 @@ paths:
       tags:
         - payment
       summary: 예약에 대한 결제 요청
-      description: 예약 ID에 해당하는 공연을 결제합니다.
+      description: 예약 ID에 해당하는 공연을 결제합니다. 프론트엔드에서 외부 결제 시스템(Naver, Kakao, Toss)으로부터 받은 결제 결과값을 포함하여 요청합니다. 결제 승인에 성공하면 상태가 `SUCCEEDED`가 되며, 실패 시 `FAILED` 코드가 반환됩니다.
       operationId: requestPayment
       parameters:
         - name: id
@@ -533,19 +533,32 @@ paths:
                   type: string
                   enum: [ naver, kakao, toss ]
                   description: 결제 방식
+                transactionId:
+                  type: string
+                  description: 외부 결제 시스템에서 발급한 거래 ID
               required:
                 - paymentMethod
+                - transactionId
       responses:
         '200':
-          description: 결제 성공
+          description: 결제 성공 또는 실패
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommonResponse'
-              example:
-                code: SUCCESS
-                data:
-                  paymentId: "fc670d11-4aa1-4ab5-b39f-b9b9443a96d9"
+              examples:
+                success:
+                  summary: 결제 성공
+                  value:
+                    code: SUCCESS
+                    data:
+                      paymentId: "fc670d11-4aa1-4ab5-b39f-b9b9443a96d9"
+                failure:
+                  summary: 결제 실패
+                  value:
+                    code: FAILED
+                    data:
+                      reason: "외부 결제 승인 실패 - 잔액 부족"
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -554,6 +567,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
   /payments/{id}/result:
     get:
       tags:

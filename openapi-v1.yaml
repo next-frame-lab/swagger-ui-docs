@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: 공연장 좌석 예매 서비스 API
-  description: 공연장 좌석 예매 서비스 API 문서
-  version: 1.0.7
+  title: 공연 좌석 예매 서비스 API
+  description: 공연 좌석 예매 서비스 API 문서
+  version: 1.1.0
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -13,6 +13,8 @@ tags:
     description: 공연 관련 API
   - name: review
     description: 공연 리뷰 관련 API
+  - name: seat
+    description: 좌석 관련 API
   - name: reservation
     description: 예매 관련 API
   - name: auth
@@ -351,37 +353,70 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /performances/{performanceId}/schedules/{scheduleId}/seats:
+
+  /stadiums/{id}/seat-definitions:
     get:
       tags:
-        - reservation
-      summary: 공연 전체 좌석 조회
-      description: 공연 ID와 공연 스케줄 ID를 통해 공연의 전체 좌석을 조회합니다.
-      operationId: getSeats
+        - seat
+      summary: 공연장의 전체 좌석 조회
       parameters:
         - in: path
-          name: performanceId
+          name: id
           required: true
-          schema:
-            type: string
-            format: uuid
-          description: 공연 ID
-        - in: path
-          name: scheduleId
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: 공연 스케줄 ID
+          schema: {type: string, format: uuid}
       security:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: 공연의 전체 좌석 반환
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SeatsResponse'
+                $ref: '#/components/schemas/SeatMinimalListResponse'
+              example:
+                code: SUCCESS
+                data:
+                  seats:
+                    - id: "faad22a7-3267-4b09-994a-8a32b3539ea4"
+                      section: "A"
+                      row: 1
+                      column: 1
+                    - id: "3f06d869-5385-4c81-a780-1b5a707375aa"
+                      section: "A"
+                      row: 1
+                      column: 2
+                    - id: "6ecb015d-cea3-445c-bc2e-da1da179177c"
+                      section: "A"
+                      row: 1
+                      column: 3
+                    - id: "8e5a146b-d0ea-4c58-89e0-2f1bf4cf1707"
+                      section: "A"
+                      row: 1
+                      column: 4
+                    - id: "4dab7a0d-1b1f-4782-bde5-b0ef26a5da8c"
+                      section: "A"
+                      row: 1
+                      column: 5
+                    - id: "b66d8cb7-a720-44a1-a19b-336edf3cbe14"
+                      section: "B"
+                      row: 2
+                      column: 1
+                    - id: "d127e4a2-f8ab-44f7-9170-e6c6e2a42dee"
+                      section: "B"
+                      row: 2
+                      column: 2
+                    - id: "6752317f-952b-49dd-85da-685bf2619fd9"
+                      section: "C"
+                      row: 2
+                      column: 3
+                    - id: "1529b1e6-ad5e-4403-82a5-88f6eee30535"
+                      section: "C"
+                      row: 2
+                      column: 4
+                    - id: "b2b35040-b5fe-4671-86ae-d78a0d6a8b6f"
+                      section: "C"
+                      row: 2
+                      column: 5
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -390,6 +425,43 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  /schedules/{id}/seat-states:
+    get:
+      tags:
+        - seat
+      summary: 좌석 상태 조회
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                code: SUCCESS
+                data:
+                  seats:
+                    - id: "6752317f-952b-49dd-85da-685bf2619fd9"
+                      isLocked: true
+                    - id: "1529b1e6-ad5e-4403-82a5-88f6eee30535"
+                      isLocked: true
+                    - id: "b2b35040-b5fe-4671-86ae-d78a0d6a8b6f"
+                      isLocked: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /reservations:
     post:
       tags:
@@ -410,8 +482,25 @@ paths:
           description: 예매 성공
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ReservationResponse'
+              example:
+                code: SUCCESS
+                data:
+                  reservationId: 21c9b168-8575-487b-add2-67db7365ef78
+                  performance:
+                    name: 햄릿
+                    scheduleDate: '2025-07-15'
+                    scheduleTime: '19:30'
+                  seats:
+                    - section: A
+                      row: 1
+                      column: 12
+                    - section: A
+                      row: 1
+                      column: 13
+                  totalAmount: 300000
+
+        '409':
+          $ref: '#/components/responses/SeatAlreadyLocked'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -437,7 +526,7 @@ paths:
               example:
                 code: SUCCESS
                 data:
-                  - id: "acbd1234-5678-9abc-def0-112233445566"
+                  - reservationId: "acbd1234-5678-9abc-def0-112233445566"
                     performance:
                       name: "햄릿"
                       scheduleDate: "2025-07-15"
@@ -461,52 +550,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /reservations/{id}/payment-info:
-    get:
-      tags:
-        - payment
-      summary: 결제 전 예약 정보 조회
-      description: 예약 ID를 통해 공연 이름, 일시, 좌석, 결제 금액 및 방식을 조회합니다.
-      operationId: getPaymentInfo
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: 예약 ID
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: 결제 정보 조회 성공
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CommonResponse"
-              example:
-                code: SUCCESS
-                data:
-                  performance:
-                    name: "햄릿"
-                    scheduleDate: "2025-07-15"
-                    scheduleTime: "19:30"
-                  seats:
-                    - section: "A"
-                      row: 1
-                      column: 12
-                    - section: "A"
-                      row: 1
-                      column: 13
-                  totalAmount: 130000
-
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /reservations/{id}/payment:
     post:
       tags:
@@ -568,50 +611,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /payments/{id}/result:
-    get:
-      tags:
-        - payment
-      summary: 결제 완료 정보 조회
-      description: 결제가 완료된 후, 사용자에게 보여줄 결제 결과 정보를 제공합니다.
-      operationId: getPaymentResult
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: 결제 ID
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: 결제 결과 조회 성공
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommonResponse'
-              example:
-                code: SUCCESS
-                data:
-                  performance:
-                    name: "햄릿"
-                    scheduleDate: "2025-07-15"
-                    scheduleTime: "19:30"
-                  seats:
-                    - section: "A"
-                      row: 1
-                      column: 12
-                    - section: "A"
-                      row: 1
-                      column: 13
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /auth/signin:
     post:
       tags:
@@ -820,7 +819,6 @@ components:
               stadiumName: "서울예술의전당"
               startDate: "2025-08-01"
               endDate: "2025-08-31"
-              averageStar: 4.7
               adultOnly: false
             - id: "ef506bfa-c48e-47d4-8ab4-199f9df6f754"
               name: "캣츠"
@@ -830,7 +828,6 @@ components:
               stadiumName: "대전월드컵경기장"
               startDate: "2025-09-10"
               endDate: "2025-09-25"
-              averageStar: 4.9
               adultOnly: false
           pagination:
             page: 0
@@ -861,6 +858,7 @@ components:
           description: "전설적인 오페라의 유령이 다시 돌아옵니다."
           adultOnly: true
           stadium:
+            id: "baea5498-7cee-41e7-aa8e-b13d89e884e7"
             name: "부산문화회관"
             address: "부산광역시 남구 유엔로 123"
           performanceSchedules:
@@ -902,19 +900,6 @@ components:
           type: string
           example: 무대 연출이 압도적이었고 배우들의 몰입도가 정말 훌륭했어요!
           description: 리뷰 본문
-    StarResponse:
-      allOf:
-        - $ref: '#/components/schemas/CommonResponse'
-        - type: object
-          properties:
-            data:
-              type: object
-              properties:
-                averageStar:
-                  type: number
-                  format: float
-                  example: 4.6
-                  description: 공연의 평균 별점(0.0 이상 5.0 이하, 소수점 1자리 허용)
     SigninData:
       type: object
       properties:
@@ -1018,62 +1003,12 @@ components:
                   type: string
                   format: date-time
                   example: 2025-07-11T12:45:00
-    SeatsResponse:
-      allOf:
-        - $ref: '#/components/schemas/CommonResponse'
-        - type: object
-          properties:
-            data:
-              type: object
-              properties:
-                seatList:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Seat'
-          example:
-            code: SUCCESS
-            data:
-              seats:
-                - id: "8c2d3b4f-1a2b-4e5d-bc6f-123456789abc"
-                  section: "A"
-                  row: 1
-                  column: 5
-                  isLocked: true
-                - id: "9e1f4a2d-3c5b-4f6a-bc7d-abcdef123456"
-                  section: "A"
-                  row: 1
-                  column: 6
-                  isLocked: true
-                - id: "7b3c1d2e-4f6a-5b7c-8d9e-7890abcdef12"
-                  section: "B"
-                  row: 2
-                  column: 10
-                  isLocked: false
-    Seat:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: 좌석의 식별자
-        section:
-          type: string
-          description: 좌석의 구역
-        row:
-          type: integer
-          description: 좌석의 행
-        column:
-          type: integer
-          description: 좌석의 열
-        isLocked:
-          type: boolean
-          description: 좌석의 잠김 상태
     ReservationRequest:
       type: object
       required:
         - performanceId
         - scheduleId
-        - seatIdList
+        - seatIds
         - elapsedTime
       properties:
         performanceId:
@@ -1091,6 +1026,10 @@ components:
           type: integer
           description: 예약에 소요된 시간(초)
           example: 140
+        totalAmount:
+          type: integer
+          description: 총 결제 금액
+          example: 300000
       example:
         performanceId: "9a1b2c3d-4e5f-6789-abcd-1234567890ab"
         scheduleId: "1a2b3c4d-5e6f-7890-abcd-0987654321ef"
@@ -1098,23 +1037,7 @@ components:
           - "aaaa1111-bbbb-2222-cccc-3333dddd4444"
           - "eeee5555-ffff-6666-gggg-7777hhhh8888"
         elapsedTime: 87
-    ReservationResponse:
-      allOf:
-        - $ref: '#/components/schemas/CommonResponse'
-        - type: object
-          properties:
-            data:
-              type: object
-              properties:
-                id:
-                  type: string
-                  format: uuid
-                  example: 9f5b3c12-cc89-4b21-8e9e-1f3f68c3fa23
-                  description: 예매 ID
-                totalAmount:
-                  type: integer
-                  example: 300000
-                  description: 총 결제 금액
+        totalAmount: 300000
 
     PerformanceSummary:
       type: object
@@ -1153,15 +1076,11 @@ components:
           format: date
           example: 2025-10-25
           description: 공연 종료 날짜
-        averageStar:
-          type: number
-          format: float
-          description: 평균 별점(0.0 ~ 5.0)
-          example: 4.8
         adultOnly:
           type: boolean
           description: 성인 공연 여부
           example: false
+
     PerformanceDetail:
       type: object
       properties:
@@ -1210,11 +1129,10 @@ components:
                 description: 공연 일정 식별자
               date:
                 type: string
-                format: date-time
+                format: date
                 description: 공연 일정의 날짜
               time:
                 type: string
-                format: time
                 description: 공연 일정의 시간
         seatSectionPrices:
           type: array
@@ -1228,9 +1146,46 @@ components:
               price:
                 type: integer
                 description: 공연의 좌석의 가격
+    SeatMinimalItem:
+      type: object
+      required: [ id, section, row, column ]
+      properties:
+        id:
+          type: string
+          format: uuid
+        section:
+          type: string
+        row:
+          type: integer
+          minimum: 1
+        column:
+          type: integer
+          minimum: 1
+
+    SeatMinimalListData:
+      type: object
+      properties:
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatMinimalItem'
+
+    SeatMinimalListResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: '#/components/schemas/SeatMinimalListData'
+
     Stadium:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          example: 10fcbc0e-db96-4f7a-a15b-fcda56967ddf
         name:
           type: string
           example: 부산문화회관
@@ -1280,7 +1235,6 @@ components:
       properties:
         code:
           type: string
-          example: INVALID_REQUEST
         data:
           nullable: true
   responses:
@@ -1291,7 +1245,7 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
-            code: INVALID_REQUEST
+            code: BAD_REQUEST
             data: null
     NotFound:
       description: 리소스를 찾을 수 없음 (404)
@@ -1318,8 +1272,18 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
-            code: INTERNAL_ERROR
+            code: INTERNAL_SERVER_ERROR
             data: null
+    SeatAlreadyLocked:
+      description: 요청한 좌석이 이미 잠겨있음 (409)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: SEAT_ALREADY_LOCKED
+            data: null
+
   securitySchemes:
     bearerAuth:
       type: http

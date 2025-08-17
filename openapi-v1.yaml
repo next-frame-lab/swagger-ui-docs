@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.1.0
+  version: 1.1.1
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -550,21 +550,13 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /reservations/{id}/payment:
+  /payments/confirm:
     post:
       tags:
         - payment
-      summary: 예약에 대한 결제 요청
-      description: 예약 ID에 해당하는 공연을 결제합니다. 프론트엔드에서 외부 결제 시스템(Naver, Kakao, Toss)으로부터 받은 결제 결과값을 포함하여 요청합니다. 결제 승인에 성공하면 상태가 `SUCCEEDED`가 되며, 실패 시 `FAILED` 코드가 반환됩니다.
-      operationId: requestPayment
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: 예약 ID
-          schema:
-            type: string
-            format: uuid
+      summary: 결제 서버에 결제 승인 요청
+      description: Toss에서 받은 peymentKey, orderId, amount로 결제 서버에 승인을 요청합니다.
+      operationId: confirm
       requestBody:
         required: true
         content:
@@ -572,44 +564,54 @@ paths:
             schema:
               type: object
               properties:
-                paymentMethod:
+                paymentkey:
                   type: string
-                  enum: [ naver, kakao, toss ]
-                  description: 결제 방식
-                transactionId:
+                  example : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+                  description: Toss에 결제 요청 후에 받은 키
+                orderId:
                   type: string
-                  description: 외부 결제 시스템에서 발급한 거래 ID
+                  description: 우리 서버 예매 Id
+                  example: resJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+                amount:
+                  type: integer
+                  example: 10000
               required:
-                - paymentMethod
-                - transactionId
+                - paymentKey
+                - orderId
+                - amount
       responses:
         '200':
-          description: 결제 성공 또는 실패
+          description: 결제 승인 성공
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CommonResponse'
-              examples:
-                success:
-                  summary: 결제 성공
-                  value:
-                    code: SUCCESS
-                    data:
-                      paymentId: "fc670d11-4aa1-4ab5-b39f-b9b9443a96d9"
-                failure:
-                  summary: 결제 실패
-                  value:
-                    code: FAILED
-                    data:
-                      reason: "외부 결제 승인 실패 - 잔액 부족"
+                $ref: "#/components/schemas/CommonResponse"
+              example:
+                code: SUCCESS
+                data:
+                  reservationId: "resJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                  totalAmount: 10000
+                message: null
         '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+          description: 결제 승인 거부
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommonResponse"
+              example:
+                code: FAILED
+                data: null
+                message: "ALREADY_PROCESSED_PAYMENT"
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommonResponse"
+              example:
+                code: FAILED
+                data: null
+                message: "결제 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
 
   /auth/signin:
     post:

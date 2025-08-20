@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.1.1
+  version: 1.1.2
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -816,8 +816,8 @@ components:
             - id: "21c9b168-8575-487b-add2-67db7365ef78"
               name: "햄릿"
               imageUrl: "https://example.com/hamlet.jpg"
-              type: "로맨스"
-              genre: "연극"
+              type: "CLASSIC"
+              genre: "PLAY"
               stadiumName: "서울예술의전당"
               startDate: "2025-08-01"
               endDate: "2025-08-31"
@@ -825,8 +825,8 @@ components:
             - id: "ef506bfa-c48e-47d4-8ab4-199f9df6f754"
               name: "캣츠"
               imageUrl: "https://example.com/cats.jpg"
-              type: "가족"
-              genre: "뮤지컬"
+              type: "CLASSIC"
+              genre: "MUSICAL"
               stadiumName: "대전월드컵경기장"
               startDate: "2025-09-10"
               endDate: "2025-09-25"
@@ -1058,11 +1058,11 @@ components:
           description: 공연 이름
         type:
           type: string
-          example: 로멘스
+          example: CLASSIC
           description: 공연 유형 (예 로맨스, 스릴러)
         genre:
           type: string
-          example: 콘서트
+          example: CONCERT
           description: 공연 유형 (예 연극, 뮤지컬)
         stadiumName:
           type: string

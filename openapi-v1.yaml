@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.1.5
+  version: 1.1.6
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -25,6 +25,8 @@ tags:
     description: 결제 관련 API
   - name: refund
     description: 환불 관련 API
+  - name: ticketing
+    description: 티켓 관련 API
 paths:
   /performances/search:
     get:
@@ -781,6 +783,34 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /tickets:
+    post:
+      tags:
+        - ticketing
+      summary: 티켓 발급
+      description: 결제 성공 후 예매 ID를 기반으로 티켓을 발급합니다.
+      operationId: issue
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          description: 예매 ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 환불 상태 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                code: SUCCESS
+                data:
+                  ticketId: "a1b2c3d4-e5f6-7890-aaaa-bbbbccccdddd"
+                  qrCode: "QR-a1b2c3d4-e5f6-7890-aaaa-bbbbccccdddd"
+                  issuedAt: "2025-07-09T18:22:00"
 
 components:
   schemas:

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.1.6
+  version: 1.1.7
 servers:
   - url: http://localhost:8081/api/v1
     description: Local Dev Server
@@ -158,6 +158,59 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /performances/top10:
+    get:
+      tags:
+        - performance
+      summary: 인기 공연 Top 10 조회
+      description: 현재 가장 인기 있는 공연 10개의 목록을 조회하는 API입니다. 인기 기준은 조회수입니다.
+      operationId: getTop10Performances
+      responses:
+        '200':
+          description: 인기 공연 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: SUCCESS
+                  data:
+                    type: object
+                    properties:
+                      performances:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PerformanceSummary'
+              example:
+                code: SUCCESS
+                data:
+                  performances:
+                    - id: "21c9b168-8575-487b-add2-67db7365ef78"
+                      name: "햄릿"
+                      imageUrl: "https://example.com/hamlet.jpg"
+                      type: "CLASSIC"
+                      genre: "PLAY"
+                      stadiumName: "서울예술의전당"
+                      startDate: "2025-08-01"
+                      endDate: "2025-08-31"
+                      adultOnly: false
+                    - id: "ef506bfa-c48e-47d4-8ab4-199f9df6f754"
+                      name: "캣츠"
+                      imageUrl: "https://example.com/cats.jpg"
+                      type: "CLASSIC"
+                      genre: "MUSICAL"
+                      stadiumName: "대전월드컵경기장"
+                      startDate: "2025-09-10"
+                      endDate: "2025-09-25"
+                      adultOnly: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':

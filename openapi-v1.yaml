@@ -2,12 +2,12 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.1.7
+  version: 1.1.9
 servers:
-  - url: http://localhost:8081/api/v1
-    description: Local Dev Server
-  - url: https://api.nextframe.com/api/v1
-    description: Production Server
+  - url: https://nextframe.wisoft.dev/service1/api/v1
+    description: Schedule Reservation Ticketing Server
+  - url: https://nextframe.wisoft.dev/service2/api/v1
+    description: Payment API Server
 tags:
   - name: performance
     description: 공연 관련 API

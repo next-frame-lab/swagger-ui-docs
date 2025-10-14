@@ -2,11 +2,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>공연장 좌석 예매 서비스 API 문서</title>
-  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui.css" />
-  <link rel="icon" type="image/png" href="swagger-ui/favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="swagger-ui/favicon-16x16.png" sizes="16x16" />
+    <meta charset="UTF-8"/>
+    <title>공연장 좌석 예매 서비스 API 문서</title>
+    <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui.css"/>
+    <link rel="icon" type="image/png" href="swagger-ui/favicon-32x32.png" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="swagger-ui/favicon-16x16.png" sizes="16x16"/>
 </head>
 
 <body>
@@ -14,18 +14,21 @@
 <script src="swagger-ui/swagger-ui-bundle.js" charset="UTF-8"></script>
 <script src="swagger-ui/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
 <script>
-  window.onload = function () {
-    window.ui = SwaggerUIBundle({
-      url: "openapi-v1.yaml",
-      dom_id: '#swagger-ui',
-      deepLinking: true,
-      presets: [
-        SwaggerUIBundle.presets.apis,
-        SwaggerUIStandalonePreset
-      ],
-      layout: "StandaloneLayout"
-    });
-  };
+    window.onload = function () {
+        window.ui = SwaggerUIBundle({
+            urls: [
+                {name: "Schedule Reservation Ticketing API", url: "https://nextframe.wisoft.dev/service1/v3/api-docs"},
+                {name: "Payment API", url: "https://nextframe.wisoft.dev/service2/v3/api-docs"}
+            ],
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            layout: "StandaloneLayout"
+        });
+    };
 </script>
 </body>
 </html>

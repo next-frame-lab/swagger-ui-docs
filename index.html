@@ -16,10 +16,7 @@
 <script>
     window.onload = function () {
         window.ui = SwaggerUIBundle({
-            urls: [
-                {name: "Schedule Reservation Ticketing API", url: "https://nextframe.wisoft.dev/service1/v3/api-docs"},
-                {name: "Payment API", url: "https://nextframe.wisoft.dev/service2/v3/api-docs"}
-            ],
+            url: "openapi-v1.yaml",
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [

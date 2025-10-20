@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.1.9
+  version: 1.1.10
 servers:
   - url: https://nextframe.wisoft.dev/service1/api/v1
     description: Schedule Reservation Ticketing Server
@@ -137,7 +137,7 @@ paths:
       description: |
         공연 ID를 통해 공연의 상세 정보를 조회합니다.
         **주의: 성인 인증이 필요한 공연의 경우, 반드시 `Authorization` 헤더에 유효한 Bearer 토큰을 포함해야 합니다.**
-        토큰이 없거나 유효하지 않으면 `401 Unauthorized` 응답을 반환합니다.
+        토큰이 없거나 유효하지 않으면 `401 Unauthorized` 또는 `403 Forbidden` 응답을 반환합니다.
       operationId: getPerformanceById
       parameters:
         - in: path
@@ -156,10 +156,12 @@ paths:
                 $ref: '#/components/schemas/PerformanceDetailResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /performances/top10:
@@ -299,10 +301,14 @@ paths:
                 $ref: '#/components/schemas/ReviewCreateResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /reviews/{id}:
@@ -327,8 +333,13 @@ paths:
             schema:
               type: object
               required:
+                - star
                 - content
               properties:
+                star:
+                  type: integer
+                  example: 4.3
+                  description: 공연 별점
                 content:
                   type: string
                   example: 무대 연출이 압도적이었고 배우들의 몰입도가 정말 훌륭했어요!
@@ -344,10 +355,12 @@ paths:
                 $ref: '#/components/schemas/ReviewUpdateResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
@@ -556,7 +569,7 @@ paths:
                   totalAmount: 300000
 
         '409':
-          $ref: '#/components/responses/SeatAlreadyLocked'
+          $ref: '#/components/responses/Conflict'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1361,6 +1374,15 @@ components:
           example:
             code: UNAUTHORIZED
             data: null
+    Forbidden:
+      description: 권한 없음 (403)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: FORBIDDEN
+            data: null
     InternalServerError:
       description: 서버 내부 오류 (500)
       content:
@@ -1370,14 +1392,14 @@ components:
           example:
             code: INTERNAL_SERVER_ERROR
             data: null
-    SeatAlreadyLocked:
-      description: 요청한 좌석이 이미 잠겨있음 (409)
+    Conflict:
+      description: 상태 충돌 (409)
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
-            code: SEAT_ALREADY_LOCKED
+            code: CONFLICT
             data: null
 
   securitySchemes:

@@ -640,7 +640,7 @@ paths:
                 orderId:
                   type: string
                   description: 우리 서버 예매 Id
-                  example: resJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+                  example: 21c9b168-8575-487b-add2-67db7365ef78
                 amount:
                   type: integer
                   example: 10000

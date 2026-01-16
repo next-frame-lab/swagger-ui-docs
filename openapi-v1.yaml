@@ -776,6 +776,25 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: 로그아웃
+      description: |
+        현재 로그인 된 사용자의 로그아웃을 처리합니다.
+        Authorization 헤더에 유효한 Access Token이 포함되어야 합니다.
+      operationId: logout
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '204':
+          description: 로그아웃 성공 (내용 없음)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /payments/{id}/refund:
     post:
       tags:

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.2.0
+  version: 1.2.2
 servers:
   - url: https://nextframe.wisoft.dev/service1/api/v1
     description: Schedule Reservation Ticketing Server
@@ -633,7 +633,7 @@ paths:
             schema:
               type: object
               properties:
-                paymentkey:
+                paymentKey:
                   type: string
                   example : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
                   description: Toss에 결제 요청 후에 받은 키
@@ -742,7 +742,7 @@ paths:
                 refreshToken:
                   type: string
                   description: 발급받았던 refresh token
-                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+                  example: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4OTQ5ZGUxZS03ZGU2LTRkYWEtOTIxNC05NzM1Njc3NDcwMjIiLCJpYXQiOjE3NjgyMTMzODksImV4cCI6MTc2OTQyMjk4OX0.BnVCRrIWRt4jFqhQqyBhOzg08giOTCAwDzwI_NGOr1Uez0q5rSekpTcjzLhAX5yK1OGMdmW7D94EqQp1j7Yyxw
               required:
                 - refreshToken
       responses:

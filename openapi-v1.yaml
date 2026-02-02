@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: 공연 좌석 예매 서비스 API
   description: 공연 좌석 예매 서비스 API 문서
-  version: 1.2.2
+  version: 1.2.3
 servers:
   - url: https://nextframe.wisoft.dev/service1/api/v1
     description: Schedule Reservation Ticketing Server
@@ -1072,6 +1072,7 @@ components:
                   writerName: "뮤덕이"
                   writerProfileImageUrl: "https://cdn.example.com/profiles/user123.jpg"
                   content: "정말 감동적인 공연이었어요. 무대 연출도 최고!"
+                  star: 4.5
                   likeStatus: true
                   likeCount: 12
                   createdAt: "2025-07-01T14:32:00"
@@ -1080,6 +1081,7 @@ components:
                   writerName: "관극러"
                   writerProfileImageUrl: "https://cdn.example.com/profiles/user456.jpg"
                   content: "배우들 연기가 인상 깊었어요. 다음에도 또 보고 싶네요!"
+                  star: 3.5
                   likeStatus: false
                   likeCount: 3
                   createdAt: "2025-07-15T11:10:00"
@@ -1333,6 +1335,12 @@ components:
           format: uri
         content:
           type: string
+        star:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+          description: 사용자가 매긴 공연 별점
         likeStatus:
           type: boolean
         likeCount:
